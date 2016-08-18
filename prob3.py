@@ -3,6 +3,8 @@
 
 from __future__ import print_function
 
+import json
+
 
 next_terminal = "()()"
 
@@ -17,6 +19,18 @@ class SlotDefinedClass(object):
 
 class Node(SlotDefinedClass):
     __slots__ = ("label", "leftmost_child", "right_sibling")
+
+    def dict(self):
+        d = {}
+        for k in self.__slots__:
+            v = getattr(self, k)
+            if isinstance(v, Node):
+                v = v.dict()
+            d[k] = v
+        return d
+
+    def __str__(self):
+        return str(self.dict())
 
 
 def make_node0(x):
@@ -41,10 +55,10 @@ def make_node4(x, t1, t2, t3, t4):
 def B():
     global next_terminal
 
-    if next_terminal[0] == "(":
+    if next_terminal and next_terminal[0] == "(":
         next_terminal = next_terminal[1:]
         first_b = B()
-        if first_b and next_terminal[0] == ")":
+        if first_b and next_terminal and next_terminal[0] == ")":
             next_terminal = next_terminal[1:]
             second_b = B()
             if not second_b:
@@ -61,7 +75,7 @@ def main():
     global next_terminal
     parse_tree = B()
 
-    print(parse_tree)
+    print(json.dumps(parse_tree.dict(), indent=4))
 
     return 0
 
