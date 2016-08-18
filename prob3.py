@@ -1,11 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+Leonard Chan
+
+Just run `python prob3.py`. The code prints the trees and contains
+asserttions, so the code should run normally if everything is correct.
+"""
+
 from __future__ import print_function
 
 import json
 
 
+# String to parse
 next_terminal = "()()"
 
 
@@ -18,9 +26,11 @@ class SlotDefinedClass(object):
 
 
 class Node(SlotDefinedClass):
+    """Nodes of tree."""
     __slots__ = ("label", "leftmost_child", "right_sibling")
 
     def dict(self):
+        """Dict representation of this tree."""
         d = {}
         for k in self.__slots__:
             v = getattr(self, k)
@@ -29,22 +39,50 @@ class Node(SlotDefinedClass):
             d[k] = v
         return d
 
-    def __str__(self):
-        return str(self.dict())
+    def height(self):
+        """Height of tree."""
+        lh = rh = 0
+        if self.leftmost_child:
+            lh = self.leftmost_child.height()
+        if self.right_sibling:
+            rh = self.right_sibling.height()
+        return max(lh, rh) + 1
+
+    def pre_order_labels(self):
+        """Get list of labels traversed in pre order."""
+        acc = [self.label]
+        if self.leftmost_child:
+            acc += self.leftmost_child.pre_order_labels()
+        if self.right_sibling:
+            acc += self.right_sibling.pre_order_labels()
+        return acc
+
+    def post_order_labels(self):
+        """Get list of labels traversed in post order."""
+        acc = []
+        if self.leftmost_child:
+            acc += self.leftmost_child.post_order_labels()
+        if self.right_sibling:
+            acc += self.right_sibling.post_order_labels()
+        acc.append(self.label)
+        return acc
 
 
 def make_node0(x):
+    """Make leaf."""
     root = Node(label=x, leftmost_child=None, right_sibling=None)
     return root
 
 
 def make_node1(x, t):
+    """Make node with only left branch."""
     root = make_node0(x)
     root.leftmost_child = t
     return root
 
 
 def make_node4(x, t1, t2, t3, t4):
+    """Make node with nested right branches."""
     root = make_node1(x, t1)
     t1.right_sibling = t2
     t2.right_sibling = t3
@@ -53,6 +91,7 @@ def make_node4(x, t1, t2, t3, t4):
 
 
 def B():
+    """Create parse tree."""
     global next_terminal
 
     if next_terminal and next_terminal[0] == "(":
@@ -72,10 +111,17 @@ def B():
 
 
 def main():
+    """Program entry point."""
     global next_terminal
     parse_tree = B()
 
+    # Pretty print tree as dict of nested dicts
     print(json.dumps(parse_tree.dict(), indent=4))
+
+    # Assertions/tests
+    assert parse_tree.height() == 10
+    assert "".join(parse_tree.pre_order_labels()) == "B(Be)B(Be)Be"
+    assert "".join(parse_tree.post_order_labels()) == "eeeB)B(B)B(B"
 
     return 0
 
