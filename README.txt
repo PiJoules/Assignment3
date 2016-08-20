@@ -130,3 +130,19 @@ Parse tree output
 
 
 Problem 4 Example output
+Stack contents and lookahead on each iteration
+['<S>'] {
+['{', '<T>'] {
+['<T>'] w
+['<S>', '<T>'] w
+['w', 'c', '<S>', '<T>'] w
+['c', '<S>', '<T>'] c
+['<S>', '<T>'] s
+['s', ';', '<T>'] s
+[';', '<T>'] ;
+['<T>'] s
+['<S>', '<T>'] s
+['s', ';', '<T>'] s
+[';', '<T>'] ;
+['<T>'] }
+['}'] }
